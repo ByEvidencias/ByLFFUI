@@ -1,0 +1,12 @@
+name: ByLFFUI
+version: 1.0.0
+main: LFF\ByEvidencias\Main
+api: 5.0.0
+description: "Looking for faction"
+author: ByEvidencias
+
+permissions:
+  lff.use:
+    description: "Permission to use /lff"
+    default: true
+    
