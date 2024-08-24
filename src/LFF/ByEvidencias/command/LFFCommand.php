@@ -7,6 +7,7 @@ namespace LFF\ByEvidencias\command;
 use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
+use pocketmine\utils\TextFormat;
 use LFF\ByEvidencias\Main;
 
 class LFFCommand extends Command {
@@ -17,13 +18,18 @@ class LFFCommand extends Command {
     }
 
     public function execute(CommandSender $sender, string $commandLabel, array $args): bool {
-        if ($sender instanceof Player) {
-            $form = Main::getInstance()->getLFFUI();
-            $sender->sendForm($form);
-            return true;
-        } else {
-            $sender->sendMessage("This command can only be executed by players.");
+        if (!$sender instanceof Player) {
+            $sender->sendMessage(TextFormat::RED . "This command can only be executed by players.");
             return false;
         }
+        
+        if (!$sender->hasPermission("lff.use")) {
+            $sender->sendMessage(TextFormat::RED . "You don't have permission to use this command.");
+            return false;
+        }
+        
+        $form = Main::getInstance()->getLFFUI();
+        $sender->sendForm($form);
+        return true;
     }
 }
