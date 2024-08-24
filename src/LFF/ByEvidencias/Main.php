@@ -8,24 +8,27 @@ use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 use LFF\ByEvidencias\command\LFFCommand;
 use pocketmine\event\Listener;
-use pocketmine\command\Command;
-use pocketmine\command\CommandSender;
-use pocketmine\utils\TextFormat;
 use jojoe77777\SimpleForm;
 use jojoe77777\FormAPI;
 
 class Main extends PluginBase implements Listener {
 
+    private static ?Main $instance = null;
+
     public function onEnable(): void {
+        self::$instance = $this;
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
         @mkdir($this->getDataFolder());
         $this->saveDefaultConfig();
 
-        
-        $this->getServer()->getCommandMap()->register("lff", new LFFCommand($this));
+        $this->getServer()->getCommandMap()->register("lff", new LFFCommand());
     }
 
-    public function getLFFUI(Player $player): void {
+    public static function getInstance(): Main {
+        return self::$instance;
+    }
+
+    public function getLFFUI(): SimpleForm {
         $form = new SimpleForm(function (Player $player, ?int $data) {
             if ($data === null) {
                 return;
@@ -46,56 +49,26 @@ class Main extends PluginBase implements Listener {
                 $config = $this->getConfig();
                 $lffMessage = $config->get("class-message", "{player} is looking for a faction and specializes in: {class}");
 
-                
                 $formMessage = str_replace(
                     ["{player}", "{class}"],
                     [$player->getName(), $selectedClass],
                     $lffMessage
                 );
 
-                
-                $this->getServer()->broadcastMessage(TextFormat::colorize($formMessage));
+                $this->getServer()->broadcastMessage($formMessage);
             }
         });
 
         $form->setTitle("§l§dLooking For Faction");
         $form->setContent("§7Select your specialty");
-        $form->addButton(
-            "§eSwordsman",
-            0,
-            "textures/items/diamond_sword"
-        );
-        $form->addButton(
-            "§eArcher",
-            0,
-            "textures/items/bow_standby"
-        );
-        $form->addButton(
-            "§eTank",
-            0,
-            "textures/items/diamond_chestplate"
-        );
-        $form->addButton(
-            "§eMiner",
-            0,
-            "textures/ui/haste_effect"
-        );
-        $form->addButton(
-            "§eExplorer",
-            0,
-            "textures/items/spyglass"
-        );
-        $form->addButton(
-            "§eBuilder",
-            0,
-            "textures/blocks/brick"
-        );
-        $form->addButton(
-            "§eFarmer",
-            0,
-            "textures/items/diamond_hoe"
-        );
-        
-        $form->sendToPlayer($player);
+        $form->addButton("§eSwordsman", 0, "textures/items/diamond_sword");
+        $form->addButton("§eArcher", 0, "textures/items/bow_standby");
+        $form->addButton("§eTank", 0, "textures/items/diamond_chestplate");
+        $form->addButton("§eMiner", 0, "textures/ui/haste_effect");
+        $form->addButton("§eExplorer", 0, "textures/items/spyglass");
+        $form->addButton("§eBuilder", 0, "textures/blocks/brick");
+        $form->addButton("§eFarmer", 0, "textures/items/diamond_hoe");
+
+        return $form;
     }
 }
